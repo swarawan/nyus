@@ -9,13 +9,34 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+            versionNameSuffix "-debug" + getWorkingBranch()
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def newApkName = "genie-${variant.versionName}.apk";
+            output.outputFile = new File(output.outputFile.parentFile, newApkName);
+        }
+    }
+}
+
+def getWorkingBranch() {
+    def workingBranch = "git rev-parse --abbrev-ref HEAD".execute().text.trim()
+
+    if (workingBranch.startsWith('develop-')) {
+        workingBranch = workingBranch - 'develop-'
+        return "-" + workingBranch
+    } else {
+        return ""
     }
 }
 
